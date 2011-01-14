@@ -1,0 +1,74 @@
+--- origsrc/clapack-3.2.1-CMAKE/CMakeLists.txt	2009-08-10 13:46:33.000000000 -0500
++++ src/clapack-3.2.1-CMAKE/CMakeLists.txt	2011-01-13 21:22:10.036356700 -0600
+@@ -18,16 +18,13 @@ if(NOT USE_BLAS_WRAP)
+   add_definitions(-DNO_BLAS_WRAP)
+ endif()
+ include_directories(${CLAPACK_SOURCE_DIR}/INCLUDE)
+-add_subdirectory(F2CLIBS)
+-add_subdirectory(BLAS)
+ add_subdirectory(SRC)
+-add_subdirectory(TESTING)
+ set(CLAPACK_VERSION 3.2.1)
+ set(CPACK_PACKAGE_VERSION_MAJOR 3)
+ set(CPACK_PACKAGE_VERSION_MINOR 2)
+ set(CPACK_PACKAGE_VERSION_PATCH 1)
+ include(CPack)
+-export(TARGETS f2c blas lapack FILE clapack-targets.cmake)
++export(TARGETS clapack FILE clapack-targets.cmake)
+ configure_file(${CLAPACK_SOURCE_DIR}/clapack-config-version.cmake.in
+   ${CLAPACK_BINARY_DIR}/clapack-config-version.cmake @ONLY)
+ configure_file(${CLAPACK_SOURCE_DIR}/clapack-config.cmake.in
+--- origsrc/clapack-3.2.1-CMAKE/SRC/CMakeLists.txt	2009-08-10 12:47:54.000000000 -0500
++++ src/clapack-3.2.1-CMAKE/SRC/CMakeLists.txt	2011-01-13 21:21:05.701844600 -0600
+@@ -375,6 +375,13 @@ endif()
+ if(BUILD_COMPLEX16)
+   set(ALLOBJ  ${ZLASRC} ${ALLAUX} ${DZLAUX})
+ endif()
+-add_library(lapack ${ALLOBJ} ${ALLXOBJ})
+-target_link_libraries(lapack blas)
++add_library(clapack SHARED ${ALLOBJ} ${ALLXOBJ})
++target_link_libraries(clapack blas f2c)
++set_target_properties(clapack PROPERTIES SOVERSION 3)
++
++install(TARGETS clapack EXPORT clapack
++        LIBRARY ARCHIVE DESTINATION lib
++        RUNTIME DESTINATION bin)
++install(FILES ../INCLUDE/clapack.h DESTINATION include/clapack)
++install(EXPORT clapack DESTINATION "lib/cmake/clapack" FILE clapack-config.cmake)
+ 
+--- origsrc/clapack-3.2.1-CMAKE/TESTING/EIG/CMakeLists.txt	2009-08-10 12:47:54.000000000 -0500
++++ src/clapack-3.2.1-CMAKE/TESTING/EIG/CMakeLists.txt	2011-01-13 21:21:25.217478600 -0600
+@@ -119,7 +119,7 @@ set(ZEIGTST  zchkee.c
+ 
+ macro(add_eig_executable name )
+   add_executable(${name} ${ARGN})
+-  target_link_libraries(${name} tmglib lapack )
++  target_link_libraries(${name} tmglib clapack )
+ endmacro(add_eig_executable)
+ 
+ add_eig_executable(xeigtsts ${SEIGTST} ${SCIGTST} ${AEIGTST} 
+--- origsrc/clapack-3.2.1-CMAKE/TESTING/LIN/CMakeLists.txt	2009-08-10 13:06:06.000000000 -0500
++++ src/clapack-3.2.1-CMAKE/TESTING/LIN/CMakeLists.txt	2011-01-13 21:21:28.337484000 -0600
+@@ -189,7 +189,7 @@ set(ZLINTSTRFP  zchkrfp.c zdrvrfp.c zdrv
+ 
+ macro(add_lin_executable name )
+   add_executable(${name} ${ARGN})
+-  target_link_libraries(${name} tmglib lapack)
++  target_link_libraries(${name} tmglib clapack)
+ endmacro(add_lin_executable)
+ 
+ add_lin_executable(xlintsts ${ALINTST} ${SCLNTST} ${SLINTST} 
+--- origsrc/clapack-3.2.1-CMAKE/TESTING/MATGEN/CMakeLists.txt	2009-08-10 12:47:54.000000000 -0500
++++ src/clapack-3.2.1-CMAKE/TESTING/MATGEN/CMakeLists.txt	2011-01-13 20:58:39.908787800 -0600
+@@ -51,8 +51,10 @@ set(ZMATGEN  zlatms.c zlatme.c zlatmr.c
+   zlagge.c zlaghe.c zlagsy.c zlakf2.c zlarge.c zlaror.c zlarot.c 
+   zlatm1.c zlarnd.c zlatm2.c zlatm3.c zlatm5.c zlatm6.c zlahilb.c)
+ 
++set(F2C_I ../../F2CLIBS/libf2c/i_len_trim.c ../../F2CLIBS/libf2c/i_ceiling.c)
++
+ set(ALLOBJ ${SMATGEN} ${CMATGEN} ${SCATGEN} ${DMATGEN} ${ZMATGEN}
+-  ${DZATGEN})
++  ${DZATGEN} ${F2C_I})
+ if(BUILD_SINGLE)
+   set(ALLOBJ $(SMATGEN) $(SCATGEN))
+ endif()

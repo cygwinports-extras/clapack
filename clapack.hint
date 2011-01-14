@@ -1,0 +1,3 @@
+category: Libs
+sdesc: "LAPACK C library (sources)"
+ldesc: "ANSI C translation of the LAPACK library"

@@ -1,0 +1,5 @@
+category: Libs
+requires: libf2c2 liblapack0
+external-source: clapack
+sdesc: "LAPACK C library (runtime)"
+ldesc: "ANSI C translation of the LAPACK library"

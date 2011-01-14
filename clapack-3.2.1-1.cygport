@@ -1,0 +1,14 @@
+inherit cmake
+
+DESCRIPTION="C translation of the LAPACK library"
+HOMEPAGE="http://www.netlib.org/clapack/"
+SRC_URI="http://www.netlib.org/clapack/${P}-CMAKE.tgz"
+SRC_DIR="${P}-CMAKE"
+
+PATCH_URI="3.2.1-no-blas-f2c.patch"
+
+PKG_NAMES="lib${PN}3 lib${PN}-devel"
+libclapack3_CONTENTS="usr/bin/cygclapack-3.dll"
+libclapack_devel_CONTENTS="usr/include/ usr/lib/ usr/share/"
+
+DISTCLEANFILES="INCLUDE/f2c.h"
